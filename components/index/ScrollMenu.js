@@ -9,7 +9,7 @@ export default function ScrollMenu({ foods }) {
   const fetchMoreData = async () => {
     setLoading(true);
     const res = await axios.get(
-      `https://jsonplaceholder.typicode.com/photos?_start=${props.length}&_limit=8`
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/foods?_start=${props.length}&_limit=8`
     );
     const data = await res.data;
     if (data.length <= 0) {
@@ -34,12 +34,14 @@ export default function ScrollMenu({ foods }) {
         <h1 className="text-3xl font-bold">This is end of the list</h1>
       )}
 
-      <span
-        onClick={fetchMoreData}
-        className="border-primary-color border-2 w-80 h-14 flex items-center justify-center text-primary-color font-bold text-3xl cursor-pointer"
-      >
-        Show more
-      </span>
+      {hasMore && (
+        <span
+          onClick={fetchMoreData}
+          className="border-primary-color border-2 w-80 h-14 flex items-center justify-center text-primary-color font-bold text-3xl cursor-pointer"
+        >
+          Show more
+        </span>
+      )}
     </div>
   );
 }

@@ -7,15 +7,15 @@ import "rc-rate/assets/index.css";
 import Link from "next/link";
 export default function Food({ food }) {
   return (
-    <Link href={"/menu/" + food.id}>
+    <Link href={"/menu/" + food.slug}>
       <a className="col-span-3">
         <div className="relative w-full h-80">
-          <Image src={food.url} layout="fill"></Image>
+          <Image src={food.images?.[0].url} layout="fill"></Image>
         </div>
 
         <div className="bg-EEE-color py-6 px-3 rounded-b-3xl">
           <h2 className="line-clamp-1 font-bold text-3xl block text-left">
-            {food.title}
+            {food.name}
           </h2>
           <div className="flex justify-between mt-2 items-center">
             {/* <ul className="flex">
@@ -40,16 +40,17 @@ export default function Food({ food }) {
               style={{ fontSize: 30 }}
               allowHalf
               className="user-rate"
-              character={
-                <FontAwesomeIcon icon={faStar} className="text-active-color" />
-              }
+              character={<FontAwesomeIcon icon={faStar} />}
               disabled={true}
             />
-            <h2 className="font-bold text-xl">Sold: {food.id}</h2>
+            <h2 className="font-bold text-xl">Sold: 0</h2>
           </div>
 
           <h2 className="font-bold text-3xl mt-2 text-price-color text-left">
-            {food.id} USD
+            {parseInt(food.prices).toLocaleString("it-IT", {
+              style: "currency",
+              currency: "VND",
+            })}
           </h2>
         </div>
       </a>

@@ -1,11 +1,21 @@
 import Layout from "../components/Layout";
 import "../styles/styles.css";
-function MyApp({ Component, pageProps }) {
+import { SessionProvider } from "next-auth/react";
+import { StoreProvider } from "../store";
+import { CookiesProvider } from "react-cookie";
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}) {
   return (
-    <Layout>
-      <Component {...pageProps} />;
-    </Layout>
+    <SessionProvider session={session}>
+      <CookiesProvider>
+        <StoreProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </StoreProvider>
+      </CookiesProvider>
+    </SessionProvider>
   );
 }
-
-export default MyApp;

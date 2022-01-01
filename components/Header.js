@@ -1,15 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { signOut, useSession } from "next-auth/react";
+import { useStore, actions } from "../store";
 
 export default function Header() {
+  const { data: session } = useSession();
   const router = useRouter();
   const currentRoute = router.pathname;
 
+  const [state, dispatch] = useStore();
+  const { cart } = state;
+
+  const search = () => {
+    const searchInput = document.querySelector(".search-input").value;
+    const urlString = "/search?keyword=" + searchInput;
+    const url = encodeURI(urlString);
+    window.location = url;
+  };
   return (
     <header className="header w-full h-60 py-6 font-Kulim_Park_Bold">
       <div className="container m-auto grid grid-cols-12 items-center gap-5 -translate-y-3 ">
@@ -69,16 +81,44 @@ export default function Header() {
         </ul>
 
         {/* Search */}
-        <div className="h-14 bg-white px-4 py-2 rounded-lg flex items-center pr-28 col-span-4 ml-3">
+        <div className="h-14 bg-white pl-4  rounded-lg flex items-center  col-span-4 ml-3 ">
           <FontAwesomeIcon
             icon={faSearch}
-            className="text-3xl"
+            className="text-3xl search-icon"
           ></FontAwesomeIcon>
           <input
             type="text"
-            className="flex-1 border-none outline-none ml-5 text-xl truncate"
+            className="flex-1 border-none outline-none ml-5 text-xl truncate search-input"
             placeholder="Search everything here ..."
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                if (event.target.value.length === 0) {
+                  return;
+                } else {
+                  search();
+                  return;
+                }
+              }
+            }}
+            onChange={(e) => {
+              if (e.target.value.length === 0) {
+                document.querySelector(".search-button").classList.add("hide");
+              } else {
+                document
+                  .querySelector(".search-button")
+                  .classList.remove("hide");
+              }
+            }}
           />
+
+          <button
+            onClick={() => {
+              search();
+            }}
+            className="justify-end h-full px-4 bg-category-color text-white search-button hide"
+          >
+            Search
+          </button>
         </div>
 
         {/* Profile */}
@@ -90,19 +130,38 @@ export default function Header() {
           ></FontAwesomeIcon>
 
           <Link href="/cart">
-            <FontAwesomeIcon
-              icon={faShoppingCart}
-              className="ml-8 cursor-pointer"
-            ></FontAwesomeIcon>
+            <div className="relative">
+              <FontAwesomeIcon
+                icon={faShoppingCart}
+                className="ml-8 cursor-pointer"
+              ></FontAwesomeIcon>
+
+              <div className="absolute px-[6px]  rounded-full bottom-5  -right-3 bg-white text-center text-base leading-[22px] text-primary-color ">
+                {cart.quantity}
+              </div>
+            </div>
           </Link>
 
           <span className="w-10 h-10 ml-8">
-            <Image
-              src="/assets/img/user-icon.png"
-              width="100%"
-              height="100%"
-              className="rounded-full cursor-pointer"
-            ></Image>
+            {session ? (
+              <Image
+                src={session.user.image}
+                width="100%"
+                height="100%"
+                className="rounded-full cursor-pointer"
+                onClick={() => signOut()}
+              />
+            ) : (
+              <Image
+                src="/assets/img/user-icon.png"
+                width="100%"
+                height="100%"
+                className="rounded-full cursor-pointer"
+                onClick={() => {
+                  router.push("/login");
+                }}
+              />
+            )}
           </span>
         </div>
       </div>
